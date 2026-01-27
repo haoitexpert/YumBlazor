@@ -22,7 +22,7 @@ else
     <div class="card-body p-4">
         <div class="row pb-3">
             <div class="col-12 text-end">
-                <button class="btn btn-lg btn-secondary" style="width:250px;">Add New Category</button>
+                <a href="category/create" class="btn btn-lg btn-secondary" style="width:250px;">Add New Category</a>
             </div>
             <p>Category's List'</p>
         </div>
@@ -41,7 +41,10 @@ else
                     {
                         <tr>
                             <td>@obj.Name</td>
-                            <td></td>
+                            <td>
+                                <a href="@($"category/update/{obj.Id}")" class="btn btn-primary">Edit</a>
+                                <button class="btn btn-danger ms-2">Delete</button>
+                            </td>
                         </tr>    
                     }
                 </tbody>

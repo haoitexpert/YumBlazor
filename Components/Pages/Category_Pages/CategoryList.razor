@@ -1,5 +1,7 @@
 ﻿@page "/category"
+@using YumBlazor.Components.Shared
 @inject ICategoryRepository _categoryRepository
+<BsModal></BsModal>
 
 @if (IsProcessing)
 {

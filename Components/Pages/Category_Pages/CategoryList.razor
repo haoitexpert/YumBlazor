@@ -2,7 +2,7 @@
 @using YumBlazor.Components.Shared
 @inject ICategoryRepository _categoryRepository
 @inject IJSRuntime _jsRuntime
-<BsModal></BsModal>
+<BsModal OnModalConfirmation="ConfirmDelete_Click"></BsModal>
 
 @if (IsProcessing)
 {
@@ -92,6 +92,7 @@ else
     private async Task ConfirmDelete_Click(bool isConfirmed)
     {
         IsProcessing = true;
+        await _jsRuntime.InvokeVoidAsync("HideConfirmationModal");
         if(isConfirmed && DeleteCategoryID != 0)
         {
            var result = await _categoryRepository.DeleteAsync(DeleteCategoryID);

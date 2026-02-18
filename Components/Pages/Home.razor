@@ -161,7 +161,8 @@ else
         //if user is not authenticated, navigate to login page
         if (!authenticated)
         {
-            _NavigationManager.NavigateTo("account/login");
+            // navigate to the login page (use full reload to avoid client-side routing issue)
+            _NavigationManager.NavigateTo("/Account/Login", forceLoad: true);
         }
         else
         {
@@ -172,6 +173,10 @@ else
             if (result)
             {
                 _JS?.ToastrSuccess("Product added to cart successfully");
+            }
+            else
+            {
+                _JS?.ToastrError("Failed to add product to cart");
             }
         }
     }

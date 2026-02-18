@@ -1,7 +1,11 @@
 ﻿@page "/"
 @using System.Globalization
+@inject AuthenticationStateProvider _AuthenticationStateProvider
+@inject IJSRuntime _JS
+@inject NavigationManager _NavigationManager
 @inject IProductRepository _productRepository
 @inject ICategoryRepository _categoryRepository
+@inject IShoppingCartRepository _cartRepository
 
 <PageTitle>Home</PageTitle>
 @if (IsProcessing)
@@ -72,7 +76,9 @@ else
                                 <h5 class="card-title text-center lead text-success">@prod.Name</h5>
                                 <p class="card-text mt-2">@((MarkupString)prod.Description)</p>
                                 <h4 class="text-center">
+                                    <div class="m-lg-auto p-2" @onclick="()=>AddOrderItem(prod)">
                                     <i class="bi bi-cart3 btn btn-success text-right  px-5 form-control" style="width:300px"> Add to cart</i>
+                                    </div>
                                 </h4>
 
 
@@ -122,9 +128,9 @@ else
         }
         else
         {
-        FilteredProducts = Products.Where(u => u.CategoryId == categoryId).ToList();
-        _selectedCategoryId = categoryId;
-        _searchText = String.Empty;
+            FilteredProducts = Products.Where(u => u.CategoryId == categoryId).ToList();
+            _selectedCategoryId = categoryId;
+            _searchText = String.Empty;
         }
     }
 
@@ -133,7 +139,7 @@ else
         if (string.IsNullOrWhiteSpace(newValueOfSearchText))
         {
             FilteredProducts = Products;
-        
+
         }
         else        {
             FilteredProducts = Products.Where(u => u.Name.Contains(newValueOfSearchText, StringComparison.OrdinalIgnoreCase)).ToList();
@@ -145,4 +151,28 @@ else
     {
         return categoryId == _selectedCategoryId ? "active" : string.Empty;
     }   
+
+    private async Task AddOrderItem(Product product)
+    {
+        var authState = await _AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        var authenticated = user.Identity is not null && user.Identity.IsAuthenticated;
+
+        //if user is not authenticated, navigate to login page
+        if (!authenticated)
+        {
+            _NavigationManager.NavigateTo("account/login");
+        }
+        else
+        {
+            //add item to cart
+            var result = await 
+            _cartRepository.UpdateCartAsync(user.FindFirst(u => u.Type.Contains("nameidentifier"))?.Value, product.Id, 1);
+
+            if (result)
+            {
+                _JS?.ToastrSuccess("Product added to cart successfully");
+            }
+        }
+    }
 }
